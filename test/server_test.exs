@@ -4,7 +4,7 @@ defmodule Todo.Server.Test do
   alias Todo.Server
 
   setup do
-    {:ok, server} = Server.start
+    {:ok, server} = Server.start()
     %{server: server}
   end
 
@@ -22,5 +22,4 @@ defmodule Todo.Server.Test do
     assert length(entries_2020) == 2
     assert length(entries_2021) == 1
   end
-
 end
