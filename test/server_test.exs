@@ -2,9 +2,14 @@ defmodule Todo.Server.Test do
   use ExUnit.Case, async: true
 
   alias Todo.Server
+  alias Todo.Database
 
   setup do
-    {:ok, server} = Server.start()
+    Database.start(folder: "./persist-test")
+
+    on_exit(fn -> File.rm_rf!("./persist-test") end)
+
+    {:ok, server} = Server.start("todo-test")
     %{server: server}
   end
 
