@@ -1,10 +1,14 @@
 defmodule Todo.Server do
+  require Logger
+
   alias Todo.List
   alias Todo.Database
   use GenServer
 
-  def start(name) do
-    GenServer.start(__MODULE__, name)
+  def start_link(name) do
+    Logger.info("Starting server for #{name}")
+
+    GenServer.start_link(__MODULE__, name)
   end
 
   def entries(server_pid, date) do
@@ -31,5 +35,4 @@ defmodule Todo.Server do
     Database.store(name, todo_list)
     {:noreply, {name, new_state}}
   end
-
 end

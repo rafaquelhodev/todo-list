@@ -3,8 +3,8 @@ defmodule Todo.Database do
 
   @db_folder "./persist"
 
-  def start(options \\ []) do
-    GenServer.start(__MODULE__, options, name: __MODULE__)
+  def start_link(options \\ []) do
+    GenServer.start_link(__MODULE__, options, name: __MODULE__)
   end
 
   def store(key, data) do
@@ -37,41 +37,15 @@ defmodule Todo.Database do
     {:ok, workers}
   end
 
-  # @impl GenServer
-  # def handle_cast({:store, key, data}, state) do
-  #   key
-  #   |> file_name()
-  #   |> File.write!(:erlang.term_to_binary(data))
-
-  #   {:noreply, state}
-  # end
-
-  # @impl GenServer
-  # def handle_call({:get, key}, _, state) do
-  #   path = file_name(key)
-
-  #   data =
-  #     case File.read(path) do
-  #       {:ok, content} -> :erlang.binary_to_term(content)
-  #       {:error, _} -> nil
-  #     end
-
-  #   {:reply, data, state}
-  # end
-
   @impl GenServer
   def handle_call({:choose_worker, key}, _, workers) do
     worker_key = :erlang.phash2(key, 3)
     {:reply, Map.get(workers, worker_key), workers}
   end
 
-  # defp file_name(key) do
-  #   Path.join(@db_folder, to_string(key))
-  # end
-
   defp start_workers() do
     for index <- 1..3, into: %{} do
-      {:ok, pid} = Todo.DatabaseWorker.start(@db_folder)
+      {:ok, pid} = Todo.DatabaseWorker.start_link(@db_folder)
       {index - 1, pid}
     end
   end
