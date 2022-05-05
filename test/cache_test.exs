@@ -5,7 +5,7 @@ defmodule Todo.Cache.Test do
   alias Todo.Server
 
   setup do
-    {:ok, cache_server} = Cache.start()
+    {:ok, cache_server} = Cache.start_link(nil)
     %{cache_server: cache_server}
   end
 

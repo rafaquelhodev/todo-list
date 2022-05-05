@@ -5,11 +5,11 @@ defmodule Todo.Server.Test do
   alias Todo.Database
 
   setup do
-    Database.start(folder: "./persist-test")
+    Database.start_link(folder: "./persist-test")
 
     on_exit(fn -> File.rm_rf!("./persist-test") end)
 
-    {:ok, server} = Server.start("todo-test")
+    {:ok, server} = Server.start_link("todo-test")
     %{server: server}
   end
 
