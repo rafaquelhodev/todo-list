@@ -1,10 +1,28 @@
 defmodule Todo.Database do
-  use GenServer
 
   @db_folder "./persist"
 
-  def start_link(options \\ []) do
-    GenServer.start_link(__MODULE__, options, name: __MODULE__)
+  def start_link do
+    unless File.exists?(@db_folder) do
+      File.mkdir!(@db_folder)
+    end
+
+    workers = Enum.map(1..3, &worker_specification/1)
+
+    Supervisor.start_link(workers, strategy: :one_for_one)
+  end
+
+  def worker_specification(worker_id) do
+    default_spec = {Todo.DatabaseWorker, {@db_folder, worker_id}}
+    Supervisor.child_spec(default_spec, id: worker_id)
+  end
+
+  def child_spec(_) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []},
+      type: :supervisor
+    }
   end
 
   def store(key, data) do
@@ -19,27 +37,9 @@ defmodule Todo.Database do
     |> Todo.DatabaseWorker.get(key)
   end
 
-  def stop() do
-    GenServer.stop(__MODULE__, :normal)
-  end
 
   defp choose_worker(key) do
     :erlang.phash2(key, 3) + 1
   end
 
-  @impl GenServer
-  def init(_) do
-    unless File.exists?(@db_folder) do
-      File.mkdir!(@db_folder)
-    end
-
-    workers = start_workers()
-    {:ok, workers}
-  end
-
-  defp start_workers() do
-    for index <- 1..3, into: %{} do
-      Todo.DatabaseWorker.start_link({@db_folder, index})
-    end
-  end
 end
