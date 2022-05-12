@@ -1,5 +1,4 @@
 defmodule Todo.Database do
-
   @db_folder "./persist"
 
   def start_link do
@@ -37,9 +36,7 @@ defmodule Todo.Database do
     |> Todo.DatabaseWorker.get(key)
   end
 
-
   defp choose_worker(key) do
     :erlang.phash2(key, 3) + 1
   end
-
 end

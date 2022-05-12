@@ -8,7 +8,7 @@ defmodule Todo.Server do
   def start_link(name) do
     Logger.info("Starting server for #{name}")
 
-    GenServer.start_link(__MODULE__, name)
+    GenServer.start_link(__MODULE__, name, name: via_tuple(name))
   end
 
   def entries(server_pid, date) do
@@ -34,5 +34,9 @@ defmodule Todo.Server do
     new_state = List.add_entry(todo_list, new_entry)
     Database.store(name, todo_list)
     {:noreply, {name, new_state}}
+  end
+
+  defp via_tuple(name) do
+    Todo.Registry.via_tuple({__MODULE__, name})
   end
 end
