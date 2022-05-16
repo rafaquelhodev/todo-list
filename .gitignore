@@ -26,4 +26,4 @@ todo-*.tar
 /tmp/
 
 # Filesystem database
-/persist
+/*persist
